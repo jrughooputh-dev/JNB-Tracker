@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>JNB Express — Company Setup Tracker</title>
+  <meta name="theme-color" content="#1B4F82"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,900&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --blue:#1B4F82; --blue2:#163E68; --brown:#5C3D2E;
+      --offwht:#F5F0EB; --offwht2:#EDE7DF;
+      --white:#FFFFFF; --black:#0D0D0D;
+      --text:#1C1C1C; --muted:#6A6560;
+      --border:rgba(92,61,46,0.13);
+      --success:#1E8A4C; --success-bg:#EAF5EE;
+      --warn-bg:#FEF3E2; --warn:#B45309;
+      --info-bg:#EBF3FB; --info:#1B4F82;
+      --danger-bg:#FDECEA; --danger:#B91C1C;
+      --gray-bg:#F4F2EF; --gray:#5F5E5A;
+      --font-d:'Exo 2',sans-serif;
+      --font-b:'Instrument Sans',sans-serif;
+      --r:10px; --r-lg:16px;
+      --shadow:0 1px 12px rgba(27,79,130,0.08);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:16px;-webkit-text-size-adjust:100%;}
+    body{
+      font-family:var(--font-b);
+      background:var(--offwht);
+      color:var(--text);
+      min-height:100svh;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── HEADER ── */
+    .site-header{
+      background:var(--white);
+      border-bottom:1px solid var(--border);
+      padding:0 clamp(16px,4vw,40px);
+      position:sticky; top:0; z-index:100;
+      height:64px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 1px 8px rgba(0,0,0,0.05);
+    }
+
+    /* CORRECT LOGO — Exo 2 italic, blue top / brown bottom split */
+    .logo-wrap{position:relative;display:inline-block;line-height:1;}
+    .logo-text{
+      font-family:var(--font-d);
+      font-style:italic;
+      font-weight:900;
+      font-size:30px;
+      letter-spacing:3px;
+      position:relative;
+      display:inline-block;
+      /* clip top half blue */
+      background:linear-gradient(
+        to bottom,
+        var(--blue) 0%,
+        var(--blue) 58%,
+        var(--brown) 58%,
+        var(--brown) 100%
+      );
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .logo-sub{
+      font-size:9px;
+      font-weight:600;
+      letter-spacing:0.2em;
+      text-transform:uppercase;
+      color:var(--muted);
+      display:block;
+      margin-top:2px;
+    }
+
+    .header-right{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:500;
+      text-align:right;
+    }
+    .header-date{font-size:11px;color:var(--muted);opacity:.6;margin-top:2px;}
+
+    /* ── LAYOUT ── */
+    .container{
+      max-width:720px;
+      margin:0 auto;
+      padding:clamp(16px,3vw,32px) clamp(14px,4vw,32px) 80px;
+    }
+
+    /* ── PROGRESS CARD ── */
+    .progress-card{
+      background:var(--blue);
+      border-radius:var(--r-lg);
+      padding:clamp(18px,3vw,28px);
+      margin-bottom:24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .progress-card::after{
+      content:'JNB';
+      position:absolute;
+      right:-16px; bottom:-20px;
+      font-family:var(--font-d);
+      font-style:italic; font-weight:900;
+      font-size:100px; line-height:1;
+      color:rgba(245,240,235,0.06);
+      pointer-events:none;
+    }
+    .progress-top{
+      display:flex; justify-content:space-between; align-items:flex-start;
+      margin-bottom:16px;
+    }
+    .progress-label{
+      font-size:11px; font-weight:600;
+      letter-spacing:0.15em; text-transform:uppercase;
+      color:rgba(245,240,235,0.6);
+      margin-bottom:6px;
+    }
+    .progress-pct{
+      font-family:var(--font-d);
+      font-style:italic; font-weight:900;
+      font-size:48px; line-height:1;
+      color:var(--offwht);
+    }
+    .progress-nums{
+      display:flex; gap:20px; flex-wrap:wrap;
+    }
+    .pn{
+      font-size:12px;
+      color:rgba(245,240,235,0.55);
+    }
+    .pn strong{color:var(--offwht); font-weight:600;}
+    .progress-bar-track{
+      height:6px; background:rgba(245,240,235,0.15);
+      border-radius:3px; overflow:hidden; margin-top:16px;
+    }
+    .progress-bar-fill{
+      height:100%; border-radius:3px;
+      background:var(--offwht);
+      transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── PHASE ── */
+    .phase{margin-bottom:12px;}
+
+    .phase-toggle{
+      width:100%;
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      padding:14px 16px;
+      display:flex; align-items:center; gap:12px;
+      cursor:pointer;
+      text-align:left;
+      transition:background 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .phase-toggle:hover{background:var(--offwht2);}
+    .phase-toggle:active{background:var(--offwht2);}
+    .phase-toggle.complete{background:var(--success-bg); border-color:rgba(30,138,76,0.2);}
+
+    .phase-badge{
+      width:26px; height:26px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:600;
+      flex-shrink:0;
+    }
+    .phase-info{flex:1; min-width:0;}
+    .phase-title{
+      font-size:14px; font-weight:600;
+      color:var(--text); margin-bottom:2px;
+    }
+    .phase-meta{
+      font-size:11.5px; color:var(--muted);
+      white-space:nowrap; overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .phase-meta.complete{color:var(--success);}
+    .phase-right{
+      display:flex; flex-direction:column;
+      align-items:flex-end; gap:4px; flex-shrink:0;
+    }
+    .phase-progress-txt{
+      font-size:11px; font-weight:600;
+      color:var(--muted);
+    }
+    .phase-mini-bar{
+      width:48px; height:3px;
+      background:var(--offwht2); border-radius:2px;
+      overflow:hidden;
+    }
+    .phase-mini-fill{
+      height:100%; border-radius:2px;
+      transition:width 0.4s ease;
+    }
+    .chevron{
+      font-size:11px; color:var(--muted);
+      transition:transform 0.25s;
+      flex-shrink:0; margin-left:4px;
+    }
+    .chevron.open{transform:rotate(180deg);}
+
+    /* ── TASK LIST ── */
+    .task-list{
+      display:none;
+      background:var(--white);
+      border:1px solid var(--border);
+      border-top:none;
+      border-radius:0 0 var(--r) var(--r);
+      overflow:hidden;
+      margin-top:-2px;
+    }
+    .task-list.open{display:block;}
+
+    .task{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      cursor:pointer;
+      transition:background 0.15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .task:last-child{border-bottom:none;}
+    .task:hover{background:var(--offwht);}
+    .task:active{background:var(--offwht2);}
+    .task.done{background:var(--success-bg);}
+    .task.done .task-title{
+      text-decoration:line-through;
+      color:var(--muted);
+    }
+    .task.done .task-desc{opacity:0.5;}
+
+    .cb{
+      width:22px; height:22px;
+      border-radius:5px;
+      border:1.5px solid var(--border);
+      background:var(--white);
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; margin-top:1px;
+      transition:all 0.15s;
+    }
+    .cb.checked{
+      background:var(--blue);
+      border-color:var(--blue);
+    }
+    .cb.checked::after{
+      content:'';
+      width:5px; height:9px;
+      border:2px solid white;
+      border-top:none; border-left:none;
+      transform:rotate(42deg) translateY(-1px);
+      display:block;
+    }
+
+    .task-body{flex:1; min-width:0;}
+    .task-title{
+      font-size:13.5px; font-weight:600;
+      color:var(--text); margin-bottom:5px;
+      display:flex; align-items:center;
+      gap:6px; flex-wrap:wrap; line-height:1.4;
+    }
+    .task-desc{
+      font-size:12.5px; color:var(--muted);
+      line-height:1.65;
+    }
+
+    .tag{
+      font-size:10px; font-weight:600;
+      padding:2px 8px; border-radius:20px;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .tag-d1{background:var(--danger-bg);color:var(--danger);}
+    .tag-w1{background:var(--warn-bg);color:var(--warn);}
+    .tag-w2{background:var(--info-bg);color:var(--info);}
+    .tag-on{background:var(--gray-bg);color:var(--gray);}
+    .tag-cost{
+      background:var(--offwht2);
+      color:var(--muted);
+      font-weight:500;
+    }
+
+    /* ── FOOTER AREA ── */
+    .footer-actions{
+      margin-top:28px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .btn-reset{
+      flex:1; min-width:140px;
+      padding:12px 16px;
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      background:var(--white);
+      color:var(--muted);
+      font-family:var(--font-b);
+      font-size:13px; font-weight:500;
+      cursor:pointer;
+      transition:background 0.15s;
+    }
+    .btn-reset:hover{background:var(--offwht2);}
+
+    .btn-export{
+      flex:1; min-width:140px;
+      padding:12px 16px;
+      border:1px solid var(--blue);
+      border-radius:var(--r);
+      background:var(--blue);
+      color:var(--offwht);
+      font-family:var(--font-b);
+      font-size:13px; font-weight:600;
+      cursor:pointer;
+      transition:background 0.15s;
+    }
+    .btn-export:hover{background:var(--blue2);}
+
+    .last-saved{
+      text-align:center;
+      font-size:11px; color:var(--muted);
+      opacity:0.6; margin-top:12px;
+    }
+
+    /* ── TOAST ── */
+    .toast{
+      position:fixed; bottom:24px; left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:var(--black); color:var(--offwht);
+      padding:10px 20px; border-radius:var(--r);
+      font-size:13px; font-weight:500;
+      opacity:0; transition:opacity 0.25s, transform 0.25s;
+      pointer-events:none; z-index:999;
+      white-space:nowrap;
+    }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:480px){
+      .phase-mini-bar{display:none;}
+      .progress-pct{font-size:40px;}
+      .header-date{display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <div class="logo-wrap">
+      <span class="logo-text">JNB</span>
+    </div>
+    <span class="logo-sub">Express Logistics</span>
+  </div>
+  <div class="header-right">
+    Company setup tracker
+    <div class="header-date" id="today"></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="progress-card">
+    <div class="progress-top">
+      <div>
+        <div class="progress-label">Overall progress</div>
+        <div class="progress-pct" id="pct">0%</div>
+        <div class="progress-nums">
+          <div class="pn"><strong id="done-n">0</strong> completed</div>
+          <div class="pn"><strong id="left-n">0</strong> remaining</div>
+          <div class="pn"><strong id="total-n">0</strong> total</div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div id="phases-container"></div>
+
+  <div class="footer-actions">
+    <button class="btn-reset" onclick="resetAll()">Reset all tasks</button>
+    <button class="btn-export" onclick="exportSummary()">Export summary</button>
+  </div>
+  <div class="last-saved" id="saved-label"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TASKS = [
+  {
+    id:'p1', title:'Day 1 — Legal foundation',
+    meta:'Public Service Hall · Revenue Service',
+    color:'var(--danger)', bg:'var(--danger-bg)', bar:'#E24B4A',
+    open:true,
+    tasks:[
+      {id:'t1',title:'IE registration',tag:'Day 1',tc:'tag-d1',cost:'60–110 GEL',
+       desc:'Register as Individual Entrepreneur at the Public Service Hall. Bring passport and proof of entry. Takes one business day. Receive tax ID and registration extract.'},
+      {id:'t2',title:'Small Business Status (1% tax)',tag:'Day 1',tc:'tag-d1',cost:'Free',
+       desc:'Apply at the Revenue Service immediately after IE registration. Activates from the first day of the following month — register early in the month to minimise standard-rate exposure.'},
+      {id:'t3',title:'NACE code 53.20 registered',tag:'Day 1',tc:'tag-d1',cost:'Included',
+       desc:'Register under NACE 53.20 — Other postal and courier activities. This is the correct code for JNB and qualifies for Small Business Status.'},
+      {id:'t4',title:'Legal address secured',tag:'Day 1',tc:'tag-d1',cost:'~$20/mo',
+       desc:'You need a registered Georgian address for the IE. Use your rental property or a provider like ExpatHub or Georgiafy.'},
+    ]
+  },
+  {
+    id:'p2', title:'Week 1 — Banking and tools',
+    meta:'TBC Bank · Wise · Track-POD · WhatsApp Business',
+    color:'var(--warn)', bg:'var(--warn-bg)', bar:'#BA7517',
+    open:false,
+    tasks:[
+      {id:'t5',title:'Georgian bank account opened',tag:'Week 1',tc:'tag-w1',cost:'Free',
+       desc:'TBC Bank or Bank of Georgia. Bring IE extract, passport, Georgian SIM. Use for local GEL transactions and monthly tax payments.'},
+      {id:'t6',title:'Wise Business active (Ninth Protocol OÜ)',tag:'Week 1',tc:'tag-w1',cost:'Free',
+       desc:'For international B2B client invoicing in USD/EUR. Keeps international revenue clean and separate from local operations.'},
+      {id:'t7',title:'Georgian SIM card active',tag:'Week 1',tc:'tag-w1',cost:'~5 GEL',
+       desc:'Required for bank account, IE registration, and WhatsApp Business. Magti or Geocell on arrival.'},
+      {id:'t8',title:'WhatsApp Business profile live',tag:'Week 1',tc:'tag-w1',cost:'Free',
+       desc:'Dedicated JNB Express number. Add business description, 24/7 hours, and services catalogue. Primary booking channel.'},
+      {id:'t9',title:'Track-POD activated',tag:'Week 1',tc:'tag-w1',cost:'$29/mo',
+       desc:'Live GPS tracking, proof of delivery photos, route optimisation. Free day-one alternative: Google Maps live location via WhatsApp.'},
+      {id:'t10',title:'Invoicing system ready',tag:'Week 1',tc:'tag-w1',cost:'Free',
+       desc:'Set up Wave (free) or Zoho Invoice. Issue professional GEL and USD invoices from day one.'},
+    ]
+  },
+  {
+    id:'p3', title:'Week 2 — Vehicle and brand',
+    meta:'Van · Insurance · Branding · Google · Trademark',
+    color:'var(--info)', bg:'var(--info-bg)', bar:'#1B4F82',
+    open:false,
+    tasks:[
+      {id:'t11',title:'Cargo van sourced and registered',tag:'Week 2',tc:'tag-w2',cost:'$3,000–$4,000',
+       desc:'Source second-hand cargo van in the Georgian market. Register at the Civil Registry — bring passport, IE extract, and proof of purchase.'},
+      {id:'t12',title:'Commercial vehicle insurance active',tag:'Week 2',tc:'tag-w2',cost:'~$400–600/yr',
+       desc:'Aldagi, GPI, or Irao. Third-party liability mandatory. Add cargo insurance to cover client packages — key trust differentiator.'},
+      {id:'t13',title:'Van wrap and branding applied',tag:'Week 2',tc:'tag-w2',cost:'$200–400',
+       desc:'JNB logo, phone number, website URL on the van in blue and brown. Looks like a real business from day one on the street.'},
+      {id:'t14',title:'Driver uniform ordered',tag:'Week 2',tc:'tag-w2',cost:'$50–100',
+       desc:'Branded JNB polo or shirt. Non-negotiable — uniform is part of the product promise and builds immediate client trust.'},
+      {id:'t15',title:'Google My Business listing live',tag:'Week 2',tc:'tag-w2',cost:'Free',
+       desc:'Register on Google Maps as "Courier service". Keywords: courier Tbilisi English, same day delivery Tbilisi, express delivery Tbilisi.'},
+      {id:'t16',title:'Instagram and Facebook pages created',tag:'Week 2',tc:'tag-w2',cost:'Free',
+       desc:'@jnbexpress on both platforms. Post the van, tracking screenshots, uniform. Show the operation working before you have clients.'},
+      {id:'t17',title:'Trademark filed — Class 39',tag:'Week 2',tc:'tag-w2',cost:'~$100',
+       desc:'File JNB trademark at Sakpatenti under Class 39 (transportation and logistics services). Protect the brand before revenue comes in.'},
+    ]
+  },
+  {
+    id:'p4', title:'Week 3–4 — First clients',
+    meta:'Outreach · Free deliveries · First contract',
+    color:'#1E8A4C', bg:'var(--success-bg)', bar:'#1E8A4C',
+    open:false,
+    tasks:[
+      {id:'t18',title:'10 walk-in outreach visits done',tag:'Week 3',tc:'tag-w2',cost:'Free',
+       desc:'Walk into hotels, boutiques, restaurants, importers. Offer two free deliveries. Show the live GPS tracking link. No commitment required.'},
+      {id:'t19',title:'First free delivery executed perfectly',tag:'Week 3',tc:'tag-w2',cost:'Free',
+       desc:'Pickup photo in 60s → live GPS link sent → delivery photo → WhatsApp confirmation. Follow up same day: was everything as expected?'},
+      {id:'t20',title:'First paying client signed',tag:'Week 4',tc:'tag-w2',cost:'Revenue',
+       desc:'Convert to paying relationship. Offer monthly: up to 20 deliveries at 10 GEL each = 200 GEL/month. Five contracts = stable base.'},
+      {id:'t21',title:'JNB-001 logged in Track-POD',tag:'Week 4',tc:'tag-w2',cost:'Revenue',
+       desc:'Your first official paid delivery. Log it as JNB-001. The start of your operational record and a milestone to look back on.'},
+    ]
+  },
+  {
+    id:'p5', title:'Ongoing — Tax and compliance',
+    meta:'Monthly · Annual · Always',
+    color:'var(--gray)', bg:'var(--gray-bg)', bar:'#888780',
+    open:false,
+    tasks:[
+      {id:'t22',title:'Local accountant hired',tag:'Ongoing',tc:'tag-on',cost:'~$50/mo',
+       desc:'Hire a Georgian accountant for monthly declarations and annual report. Removes all tax admin risk from your plate at minimal cost.'},
+      {id:'t23',title:'Monthly tax declaration system set up',tag:'By 15th',tc:'tag-on',cost:'1% turnover',
+       desc:'File 1% Small Business Status declaration by the 15th of each month via Revenue Service online portal. Pay the 1% at the same time.'},
+      {id:'t24',title:'VAT threshold tracking in place',tag:'Ongoing',tc:'tag-on',cost:'Free',
+       desc:'If turnover exceeds 100,000 GEL in any 12-month period you must register for VAT. Track this monthly from the start.'},
+      {id:'t25',title:'Annual declaration filed',tag:'By April 1',tc:'tag-on',cost:'Accountant handles',
+       desc:'Submit annual income declaration by April 1st. Your accountant handles this — ensure monthly declarations were filed correctly all year.'},
+    ]
+  }
+];
+
+const KEY = 'jnb_tracker_v1';
+let state = {};
+
+function loadState(){
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); }
+  catch(e){ state = {}; }
+}
+
+function saveState(){
+  localStorage.setItem(KEY, JSON.stringify(state));
+  const now = new Date();
+  document.getElementById('saved-label').textContent =
+    'Progress saved · ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+}
+
+function allTaskIds(){
+  return TASKS.flatMap(p => p.tasks.map(t => t.id));
+}
+
+function updateProgress(){
+  const all = allTaskIds();
+  const done = all.filter(id => state[id]);
+  const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('done-n').textContent = done.length;
+  document.getElementById('left-n').textContent = all.length - done.length;
+  document.getElementById('total-n').textContent = all.length;
+
+  TASKS.forEach(ph => {
+    const ids = ph.tasks.map(t => t.id);
+    const doneCount = ids.filter(id => state[id]).length;
+    const phPct = ids.length ? Math.round(doneCount / ids.length * 100) : 0;
+    const fill = document.querySelector('#' + ph.id + ' .phase-mini-fill');
+    const meta = document.querySelector('#' + ph.id + ' .phase-meta');
+    const pToggle = document.querySelector('#' + ph.id + ' .phase-toggle');
+    const pTxt = document.querySelector('#' + ph.id + ' .phase-progress-txt');
+    if(fill) fill.style.width = phPct + '%';
+    if(pTxt) pTxt.textContent = doneCount + '/' + ids.length;
+    if(meta){
+      if(doneCount === ids.length && ids.length > 0){
+        meta.textContent = 'All complete ✓';
+        meta.classList.add('complete');
+        if(pToggle) pToggle.classList.add('complete');
+      } else {
+        meta.textContent = ph.meta;
+        meta.classList.remove('complete');
+        if(pToggle) pToggle.classList.remove('complete');
+      }
+    }
+  });
+}
+
+function toggleTask(taskId, phId){
+  state[taskId] = !state[taskId];
+  const taskEl = document.getElementById('task-' + taskId);
+  const cb = document.getElementById('cb-' + taskId);
+  if(state[taskId]){
+    taskEl.classList.add('done');
+    cb.classList.add('checked');
+  } else {
+    taskEl.classList.remove('done');
+    cb.classList.remove('checked');
+  }
+  updateProgress();
+  saveState();
+}
+
+function togglePhase(phId){
+  const list = document.getElementById('list-' + phId);
+  const chev = document.getElementById('chev-' + phId);
+  const isOpen = list.classList.contains('open');
+  list.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+  if(!isOpen){
+    // round top of task list to match toggle
+    const toggle = document.querySelector('#' + phId + ' .phase-toggle');
+    if(toggle) toggle.style.borderRadius = 'var(--r) var(--r) 0 0';
+  } else {
+    const toggle = document.querySelector('#' + phId + ' .phase-toggle');
+    if(toggle) toggle.style.borderRadius = 'var(--r)';
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function resetAll(){
+  if(!confirm('Reset all tasks? This cannot be undone.')) return;
+  state = {};
+  document.querySelectorAll('.task').forEach(el => el.classList.remove('done'));
+  document.querySelectorAll('.cb').forEach(el => el.classList.remove('checked'));
+  localStorage.removeItem(KEY);
+  updateProgress();
+  document.getElementById('saved-label').textContent = '';
+  showToast('All tasks reset');
+}
+
+function exportSummary(){
+  const all = allTaskIds().length;
+  const done = allTaskIds().filter(id => state[id]).length;
+  const pct = Math.round(done / all * 100);
+  let txt = 'JNB EXPRESS — COMPANY SETUP SUMMARY\n';
+  txt += new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}) + '\n';
+  txt += '='.repeat(40) + '\n\n';
+  txt += `Overall: ${done}/${all} tasks complete (${pct}%)\n\n`;
+  TASKS.forEach(ph => {
+    const ids = ph.tasks.map(t => t.id);
+    const doneCount = ids.filter(id => state[id]).length;
+    txt += `${ph.title} — ${doneCount}/${ids.length}\n`;
+    ph.tasks.forEach(t => {
+      txt += `  ${state[t.id] ? '[x]' : '[ ]'} ${t.title}\n`;
+    });
+    txt += '\n';
+  });
+  const blob = new Blob([txt], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'JNB_Setup_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Summary exported');
+}
+
+function render(){
+  loadState();
+  const container = document.getElementById('phases-container');
+
+  TASKS.forEach(ph => {
+    const div = document.createElement('div');
+    div.className = 'phase';
+    div.id = ph.id;
+
+    const isOpen = ph.open;
+    const doneCount = ph.tasks.filter(t => state[t.id]).length;
+    const allCount = ph.tasks.length;
+
+    div.innerHTML = `
+      <div class="phase-toggle ${doneCount===allCount?'complete':''}"
+           onclick="togglePhase('${ph.id}')"
+           style="border-radius:${isOpen?'var(--r) var(--r) 0 0':'var(--r)'}">
+        <div class="phase-badge" style="background:${ph.bg};color:${ph.color};">
+          ${TASKS.indexOf(ph)+1}
+        </div>
+        <div class="phase-info">
+          <div class="phase-title">${ph.title}</div>
+          <div class="phase-meta ${doneCount===allCount&&allCount>0?'complete':''}">${doneCount===allCount&&allCount>0?'All complete ✓':ph.meta}</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-progress-txt">${doneCount}/${allCount}</div>
+          <div class="phase-mini-bar">
+            <div class="phase-mini-fill" style="width:${allCount?Math.round(doneCount/allCount*100):0}%;background:${ph.bar};"></div>
+          </div>
+        </div>
+        <div class="chevron ${isOpen?'open':''}" id="chev-${ph.id}">▼</div>
+      </div>
+      <div class="task-list ${isOpen?'open':''}" id="list-${ph.id}">
+        ${ph.tasks.map(t => `
+          <div class="task ${state[t.id]?'done':''}" id="task-${t.id}"
+               onclick="toggleTask('${t.id}','${ph.id}')">
+            <div class="cb ${state[t.id]?'checked':''}" id="cb-${t.id}"></div>
+            <div class="task-body">
+              <div class="task-title">
+                ${t.title}
+                <span class="tag ${t.tc}">${t.tag}</span>
+                <span class="tag tag-cost">${t.cost}</span>
+              </div>
+              <div class="task-desc">${t.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  updateProgress();
+  document.getElementById('today').textContent =
+    new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+}
+
+render();
+</script>
+</body>
+</html>
